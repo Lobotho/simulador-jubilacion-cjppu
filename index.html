@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Sistemas - Caja de Profesionales Uruguay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#e7ff56',
+                            primaryText: '#2d1a29',
+                            secondary: '#4f6cf6',
+                            dark: '#2d1a29',
+                            light: '#f8fafc'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .sticky-dashboard {
+            position: sticky;
+            top: 1rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div id="app" class="max-w-7xl mx-auto">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-brand-dark">Comparador de Sistemas de Categorías</h1>
+            <p class="text-slate-500 mt-2">Caja de Jubilaciones y Pensiones de Profesionales Universitarios (CJPPU) - Uruguay</p>
+            <button onclick="downloadPDF()" class="mt-4 bg-brand-primary hover:bg-brand-primaryText text-brand-primaryText hover:text-brand-primary px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 mx-auto no-print shadow-lg shadow-brand-primary/20 font-bold">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                Descargar PDF
+            </button>
+        </header>
+
+        <!-- Historial Base Configurable -->
+        <div class="mb-8 bg-white rounded-xl shadow-sm border border-slate-200 p-6 no-print">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center">
+                    Historial Base (Aportes ya realizados en Sistema 10)
+                </h2>
+                <button onclick="resetBaseHistory()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded border border-slate-200 transition-colors uppercase font-bold no-print">
+                    Reset
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">1ra. Esp.</label>
+                    <input type="number" id="base-cat-0" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">1ra.</label>
+                    <input type="number" id="base-cat-1" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">2da.</label>
+                    <input type="number" id="base-cat-2" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">3ra.</label>
+                    <input type="number" id="base-cat-3" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">4ta.</label>
+                    <input type="number" id="base-cat-4" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">5ta.</label>
+                    <input type="number" id="base-cat-5" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">6ta.</label>
+                    <input type="number" id="base-cat-6" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">7ma.</label>
+                    <input type="number" id="base-cat-7" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">8va.</label>
+                    <input type="number" id="base-cat-8" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">9na.</label>
+                    <input type="number" id="base-cat-9" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">10ma.</label>
+                    <input type="number" id="base-cat-10" min="0" value="0" onchange="calculate()"
+                        class="w-full border border-slate-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-primary outline-none">
+                </div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-4 italic">Estos años se consideran como base fija para ambos sistemas comparados.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Sistema 1: 10 Categorías -->
+            <div class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-brand-dark p-4 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-white font-semibold text-lg">Sistema 10 Categorías</h2>
+                        <p class="text-slate-400 text-xs">Escala Art. 59 Inc. 1</p>
+                    </div>
+                    <button onclick="resetSystem('10')" class="text-[10px] bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded border border-white/20 transition-colors uppercase font-bold no-print">
+                        Reset
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-50 text-slate-600 uppercase text-xs font-bold">
+                            <tr>
+                                <th class="px-3 py-3">Cat.</th>
+                                <th class="px-3 py-3 text-right">Sueldo</th>
+                                <th class="px-3 py-3 text-right">Aporte</th>
+                                <th class="px-3 py-3 text-center w-20">Años</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-10" class="divide-y divide-slate-100">
+                            <!-- JS Render -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sistema 2: 15 Categorías -->
+            <div class="lg:col-span-4 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-brand-secondary p-4 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-white font-semibold text-lg">Sistema 15 Categorías</h2>
+                        <p class="text-white/70 text-xs">Escala Art. 59 Inc. 2</p>
+                    </div>
+                    <button onclick="resetSystem('15')" class="text-[10px] bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded border border-white/20 transition-colors uppercase font-bold no-print">
+                        Reset
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-50 text-slate-600 uppercase text-xs font-bold">
+                            <tr>
+                                <th class="px-3 py-3">Cat.</th>
+                                <th class="px-3 py-3 text-right">Sueldo</th>
+                                <th class="px-3 py-3 text-right">Aporte</th>
+                                <th class="px-3 py-3 text-center w-20">Años</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-15" class="divide-y divide-slate-100">
+                            <!-- JS Render -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Dashboard de Resultados -->
+            <div class="lg:col-span-4">
+                <div class="sticky-dashboard space-y-6">
+                    <div class="bg-white rounded-xl shadow-md border border-slate-200 p-6">
+                        <h2 class="text-xl font-bold text-brand-dark mb-6 flex items-center">
+                            Comparativa de Jubilaciones
+                        </h2>
+
+                        <div class="space-y-6">
+                            <!-- Sistema 10 Results -->
+                            <div class="p-4 rounded-lg bg-slate-50 border border-slate-100">
+                                <h3 class="text-slate-500 text-xs font-bold uppercase mb-3 tracking-wider">Sistema 10 Categorías</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-slate-400 text-[10px] uppercase font-bold">Jubilación Est.</p>
+                                        <p id="jub-10" class="text-lg font-bold text-slate-700">$ 0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-400 text-[10px] uppercase font-bold">Inversión Total</p>
+                                        <p id="inv-10" class="text-lg font-bold text-slate-700">$ 0</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sistema 15 Results -->
+                            <div class="p-4 rounded-lg bg-brand-secondary/10 border border-brand-secondary/20">
+                                <h3 class="text-brand-secondary text-xs font-bold uppercase mb-3 tracking-wider">Sistema 15 Categorías</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-brand-secondary/60 text-[10px] uppercase font-bold">Jubilación Est.</p>
+                                        <p id="jub-15" class="text-lg font-bold text-brand-secondary">$ 0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-brand-secondary/60 text-[10px] uppercase font-bold">Inversión Total</p>
+                                        <p id="inv-15" class="text-lg font-bold text-brand-secondary">$ 0</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comparativa -->
+                            <div class="pt-4 border-t border-slate-100">
+                                <div class="mb-4">
+                                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Diferencia de Inversión</p>
+                                    <p id="diff-cost" class="text-2xl font-black text-slate-800">$ 0</p>
+                                    <p id="diff-cost-label" class="text-xs text-slate-400 italic"></p>
+                                </div>
+                                <div>
+                                    <p class="text-slate-500 text-xs font-bold uppercase mb-1">Tiempo de Recuperación</p>
+                                    <div class="flex items-baseline">
+                                        <p id="breakeven" class="text-2xl font-black text-brand-secondary">0</p>
+                                        <span class="ml-2 text-slate-500 text-sm">años</span>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 mt-1">Años necesarios para que la mayor jubilación cubra el exceso de aporte.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-brand-primary/10 border border-brand-primary/20 p-4 rounded-lg">
+                        <p class="text-brand-primaryText text-xs leading-relaxed">
+                            <strong>Nota:</strong> El cálculo incluye una <strong>base histórica configurable</strong> (por defecto: 0 años en todas) para ambos casos. La jubilación se basa en el 52.5% del promedio de los mejores 240 meses (20 años) totales.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const data10 = [{"Categoría":"1ra. Esp","Sueldo":36729,"Aporte":3802},{"Categoría":"1ra.","Sueldo":36729,"Aporte":7566},{"Categoría":"2da.","Sueldo":69479,"Aporte":14312},{"Categoría":"3ra.","Sueldo":98463,"Aporte":20283},{"Categoría":"4ta.","Sueldo":123510,"Aporte":25444},{"Categoría":"5ta.","Sueldo":144617,"Aporte":29791},{"Categoría":"6ta.","Sueldo":161998,"Aporte":33372},{"Categoría":"7ma.","Sueldo":175601,"Aporte":36174},{"Categoría":"8va.","Sueldo":185194,"Aporte":38150},{"Categoría":"9na.","Sueldo":191016,"Aporte":39349},{"Categoría":"10ma.","Sueldo":192884,"Aporte":39734}];
+        const data15 = [{"Categoría":"1ra. Esp","Sueldo":36729,"Aporte":3802},{"Categoría":"1ra.","Sueldo":36729,"Aporte":7566},{"Categoría":"2da.","Sueldo":42239,"Aporte":8701},{"Categoría":"3ra.","Sueldo":52797,"Aporte":10876},{"Categoría":"4ta.","Sueldo":63356,"Aporte":13051},{"Categoría":"5ta.","Sueldo":76029,"Aporte":15662},{"Categoría":"6ta.","Sueldo":87433,"Aporte":18011},{"Categoría":"7ma.","Sueldo":96175,"Aporte":19812},{"Categoría":"8va.","Sueldo":110603,"Aporte":22785},{"Categoría":"9na.","Sueldo":121663,"Aporte":25063},{"Categoría":"10ma.","Sueldo":130178,"Aporte":26816},{"Categoría":"11ra.","Sueldo":137990,"Aporte":28426},{"Categoría":"12da.","Sueldo":144890,"Aporte":29847},{"Categoría":"13ra.","Sueldo":150684,"Aporte":31041},{"Categoría":"14ta.","Sueldo":156712,"Aporte":32283},{"Categoría":"15ta.","Sueldo":162980,"Aporte":33574}];
+
+        // Initialize years
+        data10.forEach(item => item.anos = 0);
+        data15.forEach(item => item.anos = 0);
+
+        const formatCurrency = (num) => {
+            return '$ ' + Math.round(num).toLocaleString('es-UY');
+        };
+
+        function renderTables() {
+            const tbody10 = document.getElementById('table-10');
+            const tbody15 = document.getElementById('table-15');
+
+            tbody10.innerHTML = data10.map((item, idx) => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-3 py-2 font-medium text-slate-700">${item.Categoría}</td>
+                    <td class="px-3 py-2 text-right text-slate-600">${formatCurrency(item.Sueldo)}</td>
+                    <td class="px-3 py-2 text-right text-slate-600">${formatCurrency(item.Aporte)}</td>
+                    <td class="px-3 py-2">
+                        <input type="number" min="0" value="${item.anos}" 
+                            onchange="updateAnos('10', ${idx}, this.value)"
+                            class="w-full text-center border border-slate-200 rounded p-1 focus:ring-2 focus:ring-slate-400 outline-none">
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody15.innerHTML = data15.map((item, idx) => `
+                <tr class="hover:bg-brand-secondary/5 transition-colors">
+                    <td class="px-3 py-2 font-medium text-slate-700">${item.Categoría}</td>
+                    <td class="px-3 py-2 text-right text-slate-600">${formatCurrency(item.Sueldo)}</td>
+                    <td class="px-3 py-2 text-right text-slate-600">${formatCurrency(item.Aporte)}</td>
+                    <td class="px-3 py-2">
+                        <input type="number" min="0" value="${item.anos}" 
+                            onchange="updateAnos('15', ${idx}, this.value)"
+                            class="w-full text-center border border-slate-200 rounded p-1 focus:ring-2 focus:ring-brand-secondary outline-none">
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateAnos(system, index, value) {
+            const val = Math.max(0, parseFloat(value) || 0);
+            if (system === '10') {
+                data10[index].anos = val;
+            } else {
+                data15[index].anos = val;
+            }
+            calculate();
+        }
+
+        function resetSystem(system) {
+            if (system === '10') {
+                data10.forEach(item => item.anos = 0);
+            } else {
+                data15.forEach(item => item.anos = 0);
+            }
+            renderTables();
+            calculate();
+        }
+
+        function resetBaseHistory() {
+            for (let i = 0; i <= 10; i++) {
+                const input = document.getElementById(`base-cat-${i}`);
+                if (input) input.value = 0;
+            }
+            calculate();
+        }
+
+        function calculate() {
+            const results10 = calculateSystem(data10);
+            const results15 = calculateSystem(data15);
+
+            // Update UI
+            document.getElementById('jub-10').innerText = formatCurrency(results10.jubilacion);
+            document.getElementById('inv-10').innerText = formatCurrency(results10.inversion);
+            
+            document.getElementById('jub-15').innerText = formatCurrency(results15.jubilacion);
+            document.getElementById('inv-15').innerText = formatCurrency(results15.inversion);
+
+            // Diff
+            const diffInversion = Math.abs(results10.inversion - results15.inversion);
+            const diffJubilacionAnual = Math.abs(results10.jubilacion - results15.jubilacion) * 12;
+            
+            document.getElementById('diff-cost').innerText = formatCurrency(diffInversion);
+            
+            const label = results10.inversion > results15.inversion ? 'Más caro: Sistema 10' : 'Más caro: Sistema 15';
+            document.getElementById('diff-cost-label').innerText = label;
+
+            // Breakeven
+            if (diffJubilacionAnual > 0) {
+                const years = diffInversion / diffJubilacionAnual;
+                document.getElementById('breakeven').innerText = years.toFixed(1);
+            } else {
+                document.getElementById('breakeven').innerText = '∞';
+            }
+        }
+
+        function calculateSystem(dataset) {
+            const currentBaseHistory = data10.map((cat, idx) => {
+                const anos = parseFloat(document.getElementById(`base-cat-${idx}`).value) || 0;
+                return {
+                    Sueldo: cat.Sueldo,
+                    Aporte: cat.Aporte,
+                    anos: anos
+                };
+            });
+
+            const currentBaseInversion = currentBaseHistory.reduce((acc, item) => acc + (item.Aporte * 12 * item.anos), 0);
+            
+            let totalInversion = currentBaseInversion;
+            let allMonths = [];
+
+            // Add base history months
+            currentBaseHistory.forEach(item => {
+                const months = Math.round(item.anos * 12);
+                for (let i = 0; i < months; i++) {
+                    allMonths.push(item.Sueldo);
+                }
+            });
+
+            // Add table input months
+            dataset.forEach(item => {
+                const months = Math.round(item.anos * 12);
+                totalInversion += item.Aporte * months;
+                
+                for (let i = 0; i < months; i++) {
+                    allMonths.push(item.Sueldo);
+                }
+            });
+
+            // Sort descending to get "best years"
+            allMonths.sort((a, b) => b - a);
+
+            // Take top 240 months (20 years)
+            const top240 = allMonths.slice(0, 240);
+            
+            // Average of top 240 (if less than 240, the sum is divided by 240 as per standard rules)
+            const sumBest = top240.reduce((acc, val) => acc + val, 0);
+            const averageBest = sumBest / 240;
+            const jubilacion = averageBest * 0.525;
+
+            return {
+                inversion: totalInversion,
+                jubilacion: jubilacion
+            };
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('app');
+            const opt = {
+                margin: 0.5,
+                filename: 'comparativa-jubilacion.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: [16, 14], orientation: 'landscape' }
+            };
+            
+            const btn = document.querySelector('.no-print');
+            btn.style.visibility = 'hidden';
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.style.visibility = 'visible';
+            });
+        }
+
+        // Initial run
+        renderTables();
+        calculate();
+    </script>
+</body>
+</html>
