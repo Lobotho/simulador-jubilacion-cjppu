@@ -56,7 +56,39 @@
 
         <!-- Historial Base Configurable -->
         <div class="mb-8 bg-white rounded-xl shadow-sm border border-slate-200 p-6 no-print">
-            <div class="flex justify-between items-center mb-4">
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+                <div class="col-span-1">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Edad de Jubilación</label>
+                    <select id="jub-age" onchange="calculate()" 
+                        class="w-full border border-slate-300 rounded-lg p-2 text-sm bg-white focus:ring-2 focus:ring-brand-primary outline-none font-semibold">
+                        <option value="60">60 años (1.20% TAD)</option>
+                        <option value="61">61 años (1.26% TAD)</option>
+                        <option value="62">62 años (1.31% TAD)</option>
+                        <option value="63">63 años (1.37% TAD)</option>
+                        <option value="64">64 años (1.43% TAD)</option>
+                        <option value="65" selected>65 años (1.50% TAD)</option>
+                        <option value="66">66 años (1.57% TAD)</option>
+                        <option value="67">67 años (1.66% TAD)</option>
+                        <option value="68">68 años (1.75% TAD)</option>
+                        <option value="69">69 años (1.85% TAD)</option>
+                        <option value="70">70+ años (1.96% TAD)</option>
+                    </select>
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Años Sist. 10</label>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm font-bold text-slate-700 h-[38px] flex items-center justify-center">
+                        <span id="total-years-10">0</span>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Años Sist. 15</label>
+                    <div class="bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg p-2 text-sm font-bold text-brand-secondary h-[38px] flex items-center justify-center">
+                        <span id="total-years-15">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center mt-8 mb-4 border-t pt-6">
                 <h2 class="text-lg font-bold text-slate-800 flex items-center">
                     Historial Base (Aportes ya realizados en Sistema 10)
                 </h2>
@@ -240,9 +272,10 @@
                     </div>
 
                     <div class="bg-brand-primary/10 border border-brand-primary/20 p-4 rounded-lg">
-                        <p class="text-brand-primaryText text-xs leading-relaxed">
-                            <strong>Nota:</strong> El cálculo incluye una <strong>base histórica configurable</strong> (por defecto: 0 años en todas) para ambos casos. La jubilación se basa en el 52.5% del promedio de los mejores 240 meses (20 años) totales.
-                        </p>
+                        <div class="text-brand-primaryText text-xs leading-relaxed">
+                            <p class="mb-2"><strong>Nota:</strong> El cálculo incluye una <strong>base histórica configurable</strong> para ambos casos.</p>
+                            <p id="dynamic-note" class="font-bold">Calculado con una tasa dinámica basada en la edad y años de aporte.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -250,6 +283,20 @@
     </div>
 
     <script>
+        const TAD_TABLE = {
+            60: 0.0120, 
+            61: 0.0126,
+            62: 0.0131,
+            63: 0.0137,
+            64: 0.0143,
+            65: 0.0150,
+            66: 0.0157,
+            67: 0.0166,
+            68: 0.0175,
+            69: 0.0185,
+            70: 0.0196
+        };
+
         const data10 = [{"Categoría":"1ra. Esp","Sueldo":36729,"Aporte":3802},{"Categoría":"1ra.","Sueldo":36729,"Aporte":7566},{"Categoría":"2da.","Sueldo":69479,"Aporte":14312},{"Categoría":"3ra.","Sueldo":98463,"Aporte":20283},{"Categoría":"4ta.","Sueldo":123510,"Aporte":25444},{"Categoría":"5ta.","Sueldo":144617,"Aporte":29791},{"Categoría":"6ta.","Sueldo":161998,"Aporte":33372},{"Categoría":"7ma.","Sueldo":175601,"Aporte":36174},{"Categoría":"8va.","Sueldo":185194,"Aporte":38150},{"Categoría":"9na.","Sueldo":191016,"Aporte":39349},{"Categoría":"10ma.","Sueldo":192884,"Aporte":39734}];
         const data15 = [{"Categoría":"1ra. Esp","Sueldo":36729,"Aporte":3802},{"Categoría":"1ra.","Sueldo":36729,"Aporte":7566},{"Categoría":"2da.","Sueldo":42239,"Aporte":8701},{"Categoría":"3ra.","Sueldo":52797,"Aporte":10876},{"Categoría":"4ta.","Sueldo":63356,"Aporte":13051},{"Categoría":"5ta.","Sueldo":76029,"Aporte":15662},{"Categoría":"6ta.","Sueldo":87433,"Aporte":18011},{"Categoría":"7ma.","Sueldo":96175,"Aporte":19812},{"Categoría":"8va.","Sueldo":110603,"Aporte":22785},{"Categoría":"9na.","Sueldo":121663,"Aporte":25063},{"Categoría":"10ma.","Sueldo":130178,"Aporte":26816},{"Categoría":"11ra.","Sueldo":137990,"Aporte":28426},{"Categoría":"12da.","Sueldo":144890,"Aporte":29847},{"Categoría":"13ra.","Sueldo":150684,"Aporte":31041},{"Categoría":"14ta.","Sueldo":156712,"Aporte":32283},{"Categoría":"15ta.","Sueldo":162980,"Aporte":33574}];
 
@@ -321,8 +368,22 @@
         }
 
         function calculate() {
-            const results10 = calculateSystem(data10);
-            const results15 = calculateSystem(data15);
+            const age = parseInt(document.getElementById('jub-age').value) || 65;
+            const tad = TAD_TABLE[age] || 0.0150;
+
+            const results10 = calculateSystem(data10, tad);
+            const results15 = calculateSystem(data15, tad);
+
+            // Update Dynamic Note
+            const avgYears10 = calculateTotalYears(data10);
+            const avgYears15 = calculateTotalYears(data15);
+            
+            // Update total years in UI
+            document.getElementById('total-years-10').innerText = avgYears10.toFixed(1);
+            document.getElementById('total-years-15').innerText = avgYears15.toFixed(1);
+
+            // We use the age specific TAD and the total years to show info
+            document.getElementById('dynamic-note').innerText = `Simulando para ${age} años de edad (TAD: ${(tad * 100).toFixed(2)}%).`;
 
             // Update UI
             document.getElementById('jub-10').innerText = formatCurrency(results10.jubilacion);
@@ -349,7 +410,16 @@
             }
         }
 
-        function calculateSystem(dataset) {
+        function calculateTotalYears(dataset) {
+            let total = 0;
+            for (let i = 0; i <= 10; i++) {
+                total += parseFloat(document.getElementById(`base-cat-${i}`).value) || 0;
+            }
+            dataset.forEach(item => total += item.anos);
+            return total;
+        }
+
+        function calculateSystem(dataset, tad) {
             const currentBaseHistory = data10.map((cat, idx) => {
                 const anos = parseFloat(document.getElementById(`base-cat-${idx}`).value) || 0;
                 return {
@@ -363,10 +433,12 @@
             
             let totalInversion = currentBaseInversion;
             let allMonths = [];
+            let totalYears = 0;
 
             // Add base history months
             currentBaseHistory.forEach(item => {
                 const months = Math.round(item.anos * 12);
+                totalYears += item.anos;
                 for (let i = 0; i < months; i++) {
                     allMonths.push(item.Sueldo);
                 }
@@ -376,6 +448,7 @@
             dataset.forEach(item => {
                 const months = Math.round(item.anos * 12);
                 totalInversion += item.Aporte * months;
+                totalYears += item.anos;
                 
                 for (let i = 0; i < months; i++) {
                     allMonths.push(item.Sueldo);
@@ -391,7 +464,10 @@
             // Average of top 240 (if less than 240, the sum is divided by 240 as per standard rules)
             const sumBest = top240.reduce((acc, val) => acc + val, 0);
             const averageBest = sumBest / 240;
-            const jubilacion = averageBest * 0.525;
+            
+            // Calculated Dynamic Percentage
+            const totalPercentage = totalYears * tad;
+            const jubilacion = averageBest * totalPercentage;
 
             return {
                 inversion: totalInversion,
